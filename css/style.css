@@ -1,0 +1,22 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+main {
+    width: 1200px;
+    margin: 50px auto;
+}
+
+figure {
+    float: left;
+}
+
+#figOne {
+    margin-right: 25px;
+}
+
+img {
+    max-width: 600px;
+    height: 400px;;
+}
