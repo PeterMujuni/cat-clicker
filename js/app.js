@@ -1,24 +1,44 @@
 const firstCat = new Animal('cat.jpg', 'Freddy');
 const secondCat = new Animal('secondCat.jpg', 'James');
-const firstImg = document.getElementById('first-cat');
-const secondImg = document.getElementById('second-cat');
+const thirdCat = new Animal('thirdCat.jpg', 'Jhonny');
+const fourthCat = new Animal('fourthCat.jpg', 'Cage');
+const fithCat = new Animal('fithCat.jpg', 'Andrea');
 
-let a = 0,
-    b = 0;
+const cats = [firstCat, secondCat, thirdCat, fourthCat, fithCat];
 
-(() => {
-    document.getElementById("name-one").innerHTML = firstCat.name;
-    firstImg.src = 'images/'+ firstCat.imageUrl;
-    document.getElementById('name-two').innerHTML = secondCat.name;
-    secondImg.src = 'images/'+ secondCat.imageUrl;
-})();
 
-firstImg.addEventListener('click', function() {
-    let num = document.getElementById('num1');
-    num.innerHTML = ++a;
-}, false);
+for (let index = 0; index < cats.length; index++) {
+    const cat = cats[index];    
 
-secondImg.addEventListener('click', function() {
-    let num = document.getElementById('num2');
-    num.innerHTML = ++b;
-}, false);
+    const list = document.createElement('li');
+    list.textContent = cat.name;
+    const elFigure = document.createElement('figure');
+    const elHeader = document.createElement('h1');
+    elHeader.textContent = cat.name;
+
+    const elImage = document.createElement('img');
+    elImage.src = 'images/'+cat.imageUrl;
+
+    const elCaption = document.createElement('figcaption');
+    elCaption.innerHTML = 'number of clicks: '+ cat.clicks;
+    
+    elImage.addEventListener('click', (function(catCopy) {
+        return function() {
+            catCopy.clicks++;
+            elCaption.innerHTML = 'number of clicks: '+ cat.clicks;
+        };
+    })(cat));
+
+    list.addEventListener('click', (function(catCopy) {
+        return function() {
+            elHeader.style.visibility="visible";
+            elCaption.style.visibility="visible";
+        };
+    })(cat));
+
+    document.getElementById('list').appendChild(list);
+    document.getElementById('main').appendChild(elFigure)
+    .appendChild(elHeader);
+    elFigure.appendChild(elImage);
+    elFigure.appendChild(elCaption);
+};
