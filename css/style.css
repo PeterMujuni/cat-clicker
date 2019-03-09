@@ -3,6 +3,11 @@
     padding: 0;
     box-sizing: border-box;
 }
+
+nav {
+    background-color: bisque;
+}
+
 button {
     width: 50px;
     height: 25px;
@@ -12,8 +17,10 @@ button {
 
 figure {
     float: left;
-    width: calc(50% - 10px);
-    margin-left: 5px;
+    width: 100%;
+    padding-left: 50px;
+    color: #333;
+    background-color: aqua;
 }
 
 img {

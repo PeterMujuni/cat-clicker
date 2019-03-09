@@ -1,106 +1,120 @@
-const firstCat = new Animal('cat.jpg', 'Freddy');
-const secondCat = new Animal('secondCat.jpg', 'James');
-const thirdCat = new Animal('thirdCat.jpg', 'Jonny');
-const fourthCat = new Animal('fourthCat.jpg', 'Cage');
-const fithCat = new Animal('fithCat.jpg', 'Andrea');
 
+const listView = {
+    init: function() {
+        //get the nav html element
+        this.navElement = document.getElementById('nav');
 
+        //display the buttons and add an eventlistener to them
+        this.render();
 
+    },
 
-const viewList = {
-    init: function(objList) {
-        objList.forEach(function(obj) {
+    render: function() {
+        const cats = octopus.getCats();
+
+        for (let index = 0; index < cats.length; index++) {
+            const cat = cats[index];
+            
             const button = document.createElement('button');
-            button.textContent = obj.name;
-            document.getElementById('nav').appendChild(button);
+            button.textContent = cat.name;
+            
+            const catName = button.innerHTML;            
 
-            button.addEventListener('click', function(){
-                let valueEl = button.innerHTML;
-                //console.log(valueEl);
-                octopus.changeDisplay(valueEl);
-            });
-        });
+            button.addEventListener('click', (function(catName) {
+                return function() {
+                    octopus.changeImage(catName);
+                };
+            })(catName));
+            
+            this.navElement.appendChild(button);     
+        }
     }
 };
 
-const viewDisplay = {
-    frame: document.createElement('figure'),
-    nameHeader: document.createElement('h1'),
-    imgFrame: document.createElement('img'),
-    capElement: document.createElement('figcaption'),
+const displayView = {
     
-    init: function(obj) {
-        document.getElementById('main').appendChild(viewDisplay.frame);
-        viewDisplay.frame.appendChild(viewDisplay.nameHeader);
-        viewDisplay.frame.appendChild(viewDisplay.imgFrame);
-        viewDisplay.frame.appendChild(viewDisplay.capElement);
+    init: function() {
+        this.catName = document.getElementById('cat-name');
+        this.catImage = document.getElementById('cat-image');
+        this.countClicks = document.getElementById('count-click');
+
+        this.catImage.addEventListener('click', function() {
+            octopus.incrementClick();
+        })
+
+        this.render();
     },
-    renderDisplay: function(obj) {
-        viewDisplay.nameHeader.textContent = obj.name;
-        viewDisplay.imgFrame.src = 'images/'+obj.imageUrl;
-        viewDisplay.capElement.textContent = 'numbers of clicks are: '+obj.clicks;
+
+    render: function() {
+        const currentCat = octopus.getCurrentCat();;
+        
+        this.catName.textContent = currentCat.name;
+        this.catImage.src = 'images/'+currentCat.imageUrl;
+        this.countClicks.textContent = 'amount of clicks made: '+currentCat.clicks;
     }
 };
 
 const octopus = {
-    initDisplay: function() {
-        viewDisplay.init()
-    },
-    renderList: function() {
-        viewList.init(model.getObjects());
-    },
-    renderDisplay: function() {
-        viewDisplay.renderDisplay(model.getFirstObj());
-    },
-    changeDisplay: function(value) {
-        let obj = model.getAnObj(value);
-        viewDisplay.renderDisplay(obj);
-        
-    }
-}
-
-const model = {
-    cats: [firstCat, secondCat, thirdCat, fourthCat, fithCat],
-    
     init: function() {
+        
+        model.init();
+        //set the current model to the first in line
+        model.currentCat = model.cats[0];
+        
+        //initialize the listview and display view
+        listView.init();
+        displayView.init();
+                
+    },
 
-        if(!localStorage.objs){
-            localStorage.objs = JSON.stringify(model.cats);
-        }
+    getCurrentCat: function() {
+        return model.currentCat;
     },
-    getFirstObj: function() {
-        return model.cats[0];
+
+    getCats: function() {
+        return model.cats;
     },
-    getAnObj: function(value) {
-        for (let index = 0; index < model.cats.length; index++) {
-            if (value === model.cats[index].name) {
-                return model.cats[index];
-            }
+
+    getACat: function(nameValue) {
+        const cats = this.getCats();
+        
+        for (let index = 0; index < cats.length; index++) {
+            const cat = cats[index];
             
-        }
+            if (cat.name === nameValue) {
+                return cat;
+            };
+            
+        };
     },
-    getObjects: function() {
-        return JSON.parse(localStorage.objs);
+
+    changeImage: function(nameValue) {
+        const cat = this.getACat(nameValue);
+        model.currentCat = cat;      
+        displayView.render();
+        
+    },
+
+    incrementClick: function() {
+        model.currentCat.clicks++;
+        displayView.render();
     }
-    
 };
 
-model.init();
-octopus.renderList();
-octopus.initDisplay()  
-octopus.renderDisplay();
+const model = {
+    currentCat: null,
 
+    cats: [],
     
-//     elImage.addEventListener('click', (function(catCopy) {
-//         return function() {
-//             catCopy.clicks++;
-//             elCaption.innerHTML = 'number of clicks: '+ cat.clicks;
-//         };
-//     })(cat));
+    init: function() {
+        const catOne = new Animal('cat.jpg', 'Freddy');
+        const catTwo = new Animal('secondCat.jpg', 'James');
+        const catThree = new Animal('thirdCat.jpg', 'Jonny');
+        const catFour = new Animal('fourthCat.jpg', 'Cage');
+        const catFive = new Animal('fithCat.jpg', 'Andrea');
 
-//     list.addEventListener('click', (function(catCopy) {
-//         return function() {
-//             elHeader.style.visibility="visible";
-//             elCaption.style.visibility="visible";
-//         };
-//     })(cat));
+        this.cats = [catOne, catTwo, catThree, catFour, catFive];
+    }
+};
+
+octopus.init();
