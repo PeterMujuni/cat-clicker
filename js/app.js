@@ -11,6 +11,7 @@ const listView = {
 
     render: function() {
         const cats = octopus.getCats();
+        this.navElement.innerHTML = "";
 
         for (let index = 0; index < cats.length; index++) {
             const cat = cats[index];
@@ -22,7 +23,8 @@ const listView = {
 
             button.addEventListener('click', (function(catName) {
                 return function() {
-                    octopus.changeImage(catName);
+                    octopus.updateDisplay(catName);
+                    octopus.updateAdminDisplay();
                 };
             })(catName));
             
@@ -40,6 +42,7 @@ const displayView = {
 
         this.catImage.addEventListener('click', function() {
             octopus.incrementClick();
+            
         })
 
         this.render();
@@ -54,6 +57,87 @@ const displayView = {
     }
 };
 
+/**
+ * adminView generates the lower postion of the html.
+ * from here the HTML is controlled and manipulated.
+ */
+const adminView = {
+    init: function() {
+        const adminButton = document.getElementById('admin-button');
+        const saveButton = document.getElementById('save-button');
+        const cancelButton = document.getElementById('cancel-button');
+
+        octopus.setAdminVisible(true);
+
+        adminButton.addEventListener('click', function() {
+            //let currentCat = octopus.getCurrentCat();
+            let formSection = document.getElementById('form-section');
+            
+            
+            if(octopus.getAdminVisible()){
+                formSection.classList.add("admin-display");
+                formSection.classList.remove("admin-non-display");
+                saveButton.classList.remove("admin-non-display");
+                cancelButton.classList.remove("admin-non-display");
+                octopus.setAdminVisible(false);
+                adminView.render();                
+                
+            }else{
+                formSection.classList.remove("admin-display");
+                formSection.classList.add("admin-non-display");
+                saveButton.classList.add("admin-non-display");
+                cancelButton.classList.add("admin-non-display");
+                octopus.setAdminVisible(true);
+            }
+            
+        });
+
+        saveButton.addEventListener('click', function() {
+            octopus.saveAdminInput();;
+            console.log('save');
+            
+        });
+        
+        cancelButton.addEventListener('click', function() {
+            let formSection = document.getElementById('form-section');
+
+            if(!octopus.getAdminVisible()){
+                formSection.classList.add("admin-non-display");
+                formSection.classList.remove("admin-display");
+                saveButton.classList.add("admin-non-display");
+                cancelButton.classList.add("admin-non-display");
+                octopus.setAdminVisible(true);
+                //adminView.render();                
+                
+            }else{
+                formSection.classList.remove("admin-display");
+                formSection.classList.add("admin-non-display");
+                saveButton.classList.remove("admin-display");
+                cancelButton.classList.remove("admin-display");
+                octopus.setAdminVisible(false);
+            }
+        });
+        
+    },
+    render: function() {
+
+        const catInputName = document.getElementById('catName');
+        const catInputPicture = document.getElementById('catPicture');
+        const catInputClicks = document.getElementById('catClicks');
+
+        const cat = octopus.getCurrentCat();
+        
+        
+        catInputName.value = cat.name;
+        catInputPicture.value = cat.imageUrl;
+        catInputClicks.value = cat.clicks;
+
+        octopus.setCurrentCat(cat);
+        console.log(cat);
+        
+    }
+}
+
 const octopus = {
     init: function() {
         
@@ -64,11 +148,16 @@ const octopus = {
         //initialize the listview and display view
         listView.init();
         displayView.init();
+        adminView.init();
                 
     },
 
     getCurrentCat: function() {
         return model.currentCat;
+    },
+
+    setCurrentCat: function(cat) {
+        model.currentCat = cat;
     },
 
     getCats: function() {
@@ -88,7 +177,7 @@ const octopus = {
         };
     },
 
-    changeImage: function(nameValue) {
+    updateDisplay: function(nameValue) {
         const cat = this.getACat(nameValue);
         model.currentCat = cat;      
         displayView.render();
@@ -98,11 +187,40 @@ const octopus = {
     incrementClick: function() {
         model.currentCat.clicks++;
         displayView.render();
+    },
+
+    getAdminVisible: function() {
+        return model.adminShowing;
+    },
+
+    setAdminVisible: function(value) {
+        model.adminShowing = value;
+    },
+
+    updateAdminDisplay: function() {
+        listView.render();
+        adminView.render();
+    },
+
+    saveAdminInput: function() {
+        catInputName = document.getElementById('catName').value;
+        catInputPicture = document.getElementById('catPicture').value;
+        catInputClicks = document.getElementById('catClicks').value;
+
+        const cat = this.getCurrentCat();
+
+        cat.setName(catInputName);
+        cat.setUrl(catInputPicture);
+        cat.setClicks(catInputClicks);
+
+        displayView.render();        
     }
 };
 
 const model = {
     currentCat: null,
+
+    adminShowing: false,
 
     cats: [],
     
